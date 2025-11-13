@@ -117,3 +117,15 @@ async def verify_token(
         return VerifyTokenResponse(**user_info)
     except ValueError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_account(
+    user_info = Depends(get_current_user),
+    auth_service = Depends(get_auth_service)
+):
+    try:
+        await auth_service.delete_user(user_info["user_id"])
+        return
+    except KeyError:
+        raise HTTPException(404, "User not found")
