@@ -140,3 +140,10 @@ class AuthService:
         await self.repo.update(user)
 
         return True
+    async def delete_user(self, user_id: str) -> bool:
+        user = await self.repo.get_by_id(user_id)
+        if not user:
+            raise KeyError("User not found")
+
+        await self.repo.delete(user_id)
+        return True
