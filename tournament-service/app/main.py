@@ -19,6 +19,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    @app.get("/")
+    def root():
+        return {"message": "Service is running"}
+
     app.include_router(health_router)
     app.include_router(auth_router, prefix="/auth", tags=["auth"])
     app.include_router(tournament_router, prefix="/tournaments", tags=["tournaments"])
