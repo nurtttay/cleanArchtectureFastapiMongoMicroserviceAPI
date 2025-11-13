@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: qushcup-tournament-service
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_NAME
+        value: QushCup Tournament Service
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ALG
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 60
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DB_NAME
+        value: tournamentdb
+      - key: MONGO_URI
+        sync: false

@@ -1,0 +1,173 @@
+
+version: '3.8'
+
+services:
+  # ==================== AUTH SERVICE ====================
+  auth-service-1:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service-1
+    ports:
+      - "8080:8000"  # ← ADDED: Expose auth service
+    environment:
+      # ✅ FIXED: Use Atlas URI (same as other services)
+      - MONGO_URI=mongodb+srv://kodzgen_db_user:ynJstHDzJp1kr8j1@cluster67.uccsl1k.mongodb.net/?appName=Cluster67
+      - DB_NAME=authdb
+      - APP_NAME=Auth Service
+      - JWT_SECRET=${JWT_SECRET:-supersecret12345}
+      - JWT_ALG=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - CORS_ORIGINS=*
+    # ✅ FIXED: Remove mongo dependency (using Atlas)
+    networks:
+      - qushcup-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  auth-service-2:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service-2
+    environment:
+      # ✅ FIXED: Use Atlas URI
+      - MONGO_URI=mongodb+srv://kodzgen_db_user:ynJstHDzJp1kr8j1@cluster67.uccsl1k.mongodb.net/?appName=Cluster67
+      - DB_NAME=authdb
+      - APP_NAME=Auth Service
+      - JWT_SECRET=${JWT_SECRET:-supersecret12345}
+      - JWT_ALG=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - CORS_ORIGINS=*
+    networks:
+      - qushcup-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # ==================== TOURNAMENT SERVICE ====================
+  tournament-service-1:
+    build:
+      context: ./tournament-service
+      dockerfile: Dockerfile
+    container_name: tournament-service-1
+    environment:
+      # ✅ FIXED: Use Atlas URI consistently
+      - MONGO_URI=mongodb+srv://kodzgen_db_user:ynJstHDzJp1kr8j1@cluster67.uccsl1k.mongodb.net/?appName=Cluster67
+      - DB_NAME=tournamentdb
+      - APP_NAME=Tournament Service
+      - JWT_SECRET=${JWT_SECRET:-supersecret12345}  # ✅ FIXED: Same secret as auth
+      - JWT_ALG=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - CORS_ORIGINS=*
+    networks:
+      - qushcup-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  tournament-service-2:
+    build:
+      context: ./tournament-service
+      dockerfile: Dockerfile
+    container_name: tournament-service-2
+    environment:
+      - MONGO_URI=mongodb+srv://kodzgen_db_user:ynJstHDzJp1kr8j1@cluster67.uccsl1k.mongodb.net/?appName=Cluster67
+      - DB_NAME=tournamentdb
+      - APP_NAME=Tournament Service
+      - JWT_SECRET=${JWT_SECRET:-supersecret12345}  # ✅ FIXED: Same secret
+      - JWT_ALG=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - CORS_ORIGINS=*
+    networks:
+      - qushcup-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # ==================== PAYMENT SERVICE ====================
+  payment-service-1:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service-1
+    environment:
+      - MONGO_URI=mongodb+srv://kodzgen_db_user:ynJstHDzJp1kr8j1@cluster67.uccsl1k.mongodb.net/?appName=Cluster67
+      - DB_NAME=paymentdb
+      - APP_NAME=Payment Service
+      - JWT_SECRET=${JWT_SECRET:-supersecret12345}  # ✅ FIXED: Same secret
+      - JWT_ALG=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - CORS_ORIGINS=*
+    networks:
+      - qushcup-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  payment-service-2:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service-2
+    environment:
+      - MONGO_URI=mongodb+srv://kodzgen_db_user:ynJstHDzJp1kr8j1@cluster67.uccsl1k.mongodb.net/?appName=Cluster67
+      - DB_NAME=paymentdb
+      - APP_NAME=Payment Service
+      - JWT_SECRET=${JWT_SECRET:-supersecret12345}  # ✅ FIXED: Same secret
+      - JWT_ALG=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - CORS_ORIGINS=*
+    networks:
+      - qushcup-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  # ==================== NGINX LOAD BALANCER ====================
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-gateway
+    ports:
+        - "9080:80"  # Changed from 8080
+        - "9081:81"  # Changed from 8081
+        - "9082:82"  # Changed from 8082
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth-service-1
+      - auth-service-2
+      - tournament-service-1
+      - tournament-service-2
+      - payment-service-1
+      - payment-service-2
+    networks:
+      - qushcup-network
+    restart: unless-stopped
+
+networks:
+  qushcup-network:
+    driver: bridge
+
+# ✅ REMOVED: No need for mongo volumes since using Atlas

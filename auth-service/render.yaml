@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: qushcup-auth-service
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_NAME
+        value: QushCup Auth Service
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALG
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: DB_NAME
+        value: authdb
+      - key: MONGO_URI
+        sync: false
