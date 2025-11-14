@@ -1,8 +1,8 @@
 import os
 
 class Settings:
-    APP_NAME: str = os.getenv("APP_NAME", "tournament-service")  # or "payment-service"
-    DB_NAME: str = os.getenv("DB_NAME", "tournamentdb")  # or "paymentdb"
+    APP_NAME: str = os.getenv("APP_NAME", "payment-service")  # or "payment-service"
+    DB_NAME: str = os.getenv("DB_NAME", "paymentdb")  # or "paymentdb"
     MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017/?replicaSet=rs0")
     JWT_SECRET: str = os.getenv("JWT_SECRET", "and_also_here")
     JWT_ALG: str = os.getenv("JWT_ALG", "HS256")
