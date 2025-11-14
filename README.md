@@ -387,7 +387,10 @@ tournamentdb → tournaments
 paymentdb → payments
 
 
-
+Deploy
+https://cleanarchtecturefastapimongomicroservice-po8u.onrender.com/docs#/default/healthz_healthz_get
+https://cleanarchtecturefastapimongomicroservice-vdyf.onrender.com/docs#/Authentication/get_profile_auth_me_get
+https://cleanarchtecturefastapimongomicroservice-nb3v.onrender.com/docs
 
 🤝 Contributing
 Contributions are welcome! Please follow these steps:
